@@ -13,7 +13,8 @@ import {
   X, 
   Trash2, 
   Edit3,
-  FileText
+  FileText,
+  RefreshCw
 } from "lucide-react";
 
 export default function MemoryVault() {
