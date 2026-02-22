@@ -1,8 +1,15 @@
 @echo off
 setlocal enabledelayedexpansion
+
+:: 防止双击后一闪而过：自动拉起持久窗口
+if /i "%~1" neq "--stay" (
+  start "ni-mission-control-launch" cmd /k ""%~f0" --stay"
+  exit /b
+)
+
 cd /d "%~dp0.."
 
-echo 🚀 启动 ni-mission-control + Cloudflare Tunnel...
+echo 启动 ni-mission-control + Cloudflare Tunnel...
 
 :: 1) 启动本地服务
 start "ni-mission-control-dev" cmd /k "npm run dev"
