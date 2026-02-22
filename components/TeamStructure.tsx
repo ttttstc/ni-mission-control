@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
 import {
@@ -30,6 +30,7 @@ const roleIcons: Record<string, any> = {
 export default function TeamStructure() {
   const agents = useQuery(api.agents.list);
   const updateProfile = useMutation(api.agents.updateProfile);
+  const ensureDefaults = useMutation(api.agents.ensureDefaults);
 
   const [selected, setSelected] = useState<any | null>(null);
   const [form, setForm] = useState<any | null>(null);
@@ -37,23 +38,13 @@ export default function TeamStructure() {
   const [showIdentity, setShowIdentity] = useState(false);
   const [showMemory, setShowMemory] = useState(false);
 
+  useEffect(() => {
+    ensureDefaults();
+  }, [ensureDefaults]);
+
   if (!agents) return <div className="p-8 text-center text-slate-500">正在扫描团队状态...</div>;
 
-  const coreLeader = {
-    _id: null,
-    name: "小泥巴 (nibazhubot)",
-    role: "Leader / Orchestrator",
-    description: "主协调者，负责任务分解、资源分配以及与人类用户的直接沟通。拥有全权限访问和最高级推理能力。",
-    soul: "温和、轻松、专业。先解决问题，再解释细节。",
-    identity: "主助手 / 总调度",
-    memory: "维护长期上下文与关键决策",
-    workspacePath: "C:/Users/23742/.openclaw",
-    status: "online",
-    avatar: "🛠️",
-    capabilities: ["Orchestration", "Decision Making", "Memory Management"],
-  };
-
-  const coreTeam = [coreLeader, ...agents];
+  const coreTeam = agents;
 
   const openDetail = (member: any) => {
     setSelected(member);
