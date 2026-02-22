@@ -24,10 +24,8 @@ for /l %%i in (1,1,40) do (
 :found
 if defined TUNNEL_URL (
   echo Public URL: !TUNNEL_URL!
-  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Tunnel ready.`n`nPublic URL:`n!TUNNEL_URL!`n`nKeep tunnel window open.','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information)" >nul
 ) else (
   echo Could not parse URL automatically. Please check tunnel.log.
-  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Could not parse public URL automatically. Please open tunnel.log.','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning)" >nul
 )
 
 echo.
