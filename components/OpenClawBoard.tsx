@@ -24,6 +24,10 @@ export default function OpenClawBoard() {
   const pnl = marketValue - costBasis;
   const pnlRate = costBasis > 0 ? (pnl / costBasis) * 100 : 0;
 
+  // 成本默认按 USD 存储，页面换算为人民币展示
+  const usdToCny = 7.2;
+  const costCny = (summary?.costUsd ?? 0) * usdToCny;
+
   return (
     <div className="h-full w-full bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 flex flex-col shadow-inner">
       <div className="bg-indigo-600 px-6 py-2 flex items-center justify-between text-white shadow-md">
@@ -62,7 +66,7 @@ export default function OpenClawBoard() {
           <MetricCard icon={<Coins size={16} />} label="输入 Tokens" value={summary ? formatNumber(summary.inputTokens) : "--"} />
           <MetricCard icon={<Coins size={16} />} label="输出 Tokens" value={summary ? formatNumber(summary.outputTokens) : "--"} />
           <MetricCard icon={<BarChart3 size={16} />} label="总 Tokens" value={summary ? formatNumber(summary.totalTokens) : "--"} />
-          <MetricCard icon={<Clock3 size={16} />} label="估算成本($)" value={summary ? summary.costUsd.toFixed(4) : "--"} />
+          <MetricCard icon={<Clock3 size={16} />} label="预估成本(¥)" value={summary ? costCny.toFixed(2) : "--"} />
         </div>
 
         <section className="bg-white rounded-2xl p-5 border border-slate-100">
