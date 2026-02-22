@@ -33,6 +33,9 @@ export default function TeamStructure() {
 
   const [selected, setSelected] = useState<any | null>(null);
   const [form, setForm] = useState<any | null>(null);
+  const [showSoul, setShowSoul] = useState(false);
+  const [showIdentity, setShowIdentity] = useState(false);
+  const [showMemory, setShowMemory] = useState(false);
 
   if (!agents) return <div className="p-8 text-center text-slate-500">正在扫描团队状态...</div>;
 
@@ -56,10 +59,15 @@ export default function TeamStructure() {
       role: member.role,
       description: member.description,
       soul: member.soul ?? "",
+      identity: member.identity ?? "",
+      memory: member.memory ?? "",
       avatar: member.avatar ?? "🤖",
       status: member.status,
       capabilities: (member.capabilities ?? []).join(", "),
     });
+    setShowSoul(false);
+    setShowIdentity(false);
+    setShowMemory(false);
   };
 
   const saveDetail = async () => {
@@ -70,6 +78,8 @@ export default function TeamStructure() {
       role: form.role,
       description: form.description,
       soul: form.soul,
+      identity: form.identity,
+      memory: form.memory,
       avatar: form.avatar,
       status: form.status,
       capabilities: form.capabilities
@@ -162,7 +172,24 @@ export default function TeamStructure() {
             </div>
 
             <textarea className="w-full border rounded-xl px-3 py-2 text-sm mb-3 h-20" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} placeholder="职责描述" />
-            <textarea className="w-full border rounded-xl px-3 py-2 text-sm mb-3 h-24" value={form.soul} onChange={(e) => setForm({ ...form, soul: e.target.value })} placeholder="Soul（行为/风格/原则）" />
+
+            <div className="space-y-3 mb-3">
+              <button onClick={() => setShowSoul((v) => !v)} className="w-full text-left px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-sm font-semibold">{showSoul ? "隐藏" : "查看"} SOUL</button>
+              {showSoul && (
+                <textarea className="w-full border rounded-xl px-3 py-2 text-sm h-24" value={form.soul} onChange={(e) => setForm({ ...form, soul: e.target.value })} placeholder="Soul（行为/风格/原则）" />
+              )}
+
+              <button onClick={() => setShowIdentity((v) => !v)} className="w-full text-left px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-sm font-semibold">{showIdentity ? "隐藏" : "查看"} IDENTITY</button>
+              {showIdentity && (
+                <textarea className="w-full border rounded-xl px-3 py-2 text-sm h-24" value={form.identity} onChange={(e) => setForm({ ...form, identity: e.target.value })} placeholder="Identity（身份画像）" />
+              )}
+
+              <button onClick={() => setShowMemory((v) => !v)} className="w-full text-left px-3 py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-sm font-semibold">{showMemory ? "隐藏" : "查看"} MEMORY</button>
+              {showMemory && (
+                <textarea className="w-full border rounded-xl px-3 py-2 text-sm h-28" value={form.memory} onChange={(e) => setForm({ ...form, memory: e.target.value })} placeholder="Memory（长期记忆摘要）" />
+              )}
+            </div>
+
             <input className="w-full border rounded-xl px-3 py-2 text-sm mb-5" value={form.capabilities} onChange={(e) => setForm({ ...form, capabilities: e.target.value })} placeholder="能力标签，用逗号分隔" />
 
             <div className="flex justify-end gap-3">
