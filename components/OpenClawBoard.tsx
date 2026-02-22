@@ -11,20 +11,10 @@ function formatNumber(n: number) {
 
 export default function OpenClawBoard() {
   const [range, setRange] = useState<7 | 30>(7);
-  const [shares, setShares] = useState(100);
-  const [buyPrice, setBuyPrice] = useState(10);
-  const [currentPrice, setCurrentPrice] = useState(12);
-
   const summary = useQuery(api.tokenMetrics.summary, { days: range });
   const byModel = useQuery(api.tokenMetrics.byModel, { days: range });
   const recent = useQuery(api.tokenMetrics.recent, { limit: 20 });
 
-  const marketValue = shares * currentPrice;
-  const costBasis = shares * buyPrice;
-  const pnl = marketValue - costBasis;
-  const pnlRate = costBasis > 0 ? (pnl / costBasis) * 100 : 0;
-
-  // 成本默认按 USD 存储，页面换算为人民币展示
   const usdToCny = 7.2;
   const costCny = (summary?.costUsd ?? 0) * usdToCny;
 
@@ -37,24 +27,10 @@ export default function OpenClawBoard() {
         </div>
         <div className="flex items-center gap-2">
           <div className="bg-white/20 rounded-full p-0.5 text-[10px]">
-            <button
-              onClick={() => setRange(7)}
-              className={`px-3 py-1 rounded-full ${range === 7 ? "bg-white text-indigo-600" : "text-white/80"}`}
-            >
-              近7天
-            </button>
-            <button
-              onClick={() => setRange(30)}
-              className={`px-3 py-1 rounded-full ${range === 30 ? "bg-white text-indigo-600" : "text-white/80"}`}
-            >
-              近30天
-            </button>
+            <button onClick={() => setRange(7)} className={`px-3 py-1 rounded-full ${range === 7 ? "bg-white text-indigo-600" : "text-white/80"}`}>近7天</button>
+            <button onClick={() => setRange(30)} className={`px-3 py-1 rounded-full ${range === 30 ? "bg-white text-indigo-600" : "text-white/80"}`}>近30天</button>
           </div>
-          <button
-            onClick={() => window.location.reload()}
-            className="text-[10px] font-medium opacity-90 hover:opacity-100 flex items-center gap-1"
-            title="刷新监控数据"
-          >
+          <button onClick={() => window.location.reload()} className="text-[10px] font-medium opacity-90 hover:opacity-100 flex items-center gap-1" title="刷新监控数据">
             <RefreshCw size={12} /> 刷新
           </button>
         </div>
@@ -81,30 +57,6 @@ export default function OpenClawBoard() {
                 <div className="col-span-3 text-slate-500">总计 {formatNumber(row.totalTokens)}</div>
               </div>
             ))}
-          </div>
-        </section>
-
-        <section className="bg-white rounded-2xl p-5 border border-slate-100">
-          <h3 className="text-sm font-bold text-slate-800 mb-3">股票价格计算</h3>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-xs">
-            <label className="flex flex-col gap-1">
-              <span className="text-slate-400">持股数量</span>
-              <input type="number" value={shares} onChange={(e) => setShares(Number(e.target.value || 0))} className="border border-slate-200 rounded-xl px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-slate-400">买入价格</span>
-              <input type="number" value={buyPrice} onChange={(e) => setBuyPrice(Number(e.target.value || 0))} className="border border-slate-200 rounded-xl px-3 py-2" />
-            </label>
-            <label className="flex flex-col gap-1">
-              <span className="text-slate-400">当前价格</span>
-              <input type="number" value={currentPrice} onChange={(e) => setCurrentPrice(Number(e.target.value || 0))} className="border border-slate-200 rounded-xl px-3 py-2" />
-            </label>
-          </div>
-          <div className="mt-4 grid grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-            <div className="bg-slate-50 rounded-xl p-3"><div className="text-slate-400">持仓市值</div><div className="font-bold text-slate-800">{marketValue.toFixed(2)}</div></div>
-            <div className="bg-slate-50 rounded-xl p-3"><div className="text-slate-400">持仓成本</div><div className="font-bold text-slate-800">{costBasis.toFixed(2)}</div></div>
-            <div className="bg-slate-50 rounded-xl p-3"><div className="text-slate-400">盈亏金额</div><div className={`font-bold ${pnl >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{pnl.toFixed(2)}</div></div>
-            <div className="bg-slate-50 rounded-xl p-3"><div className="text-slate-400">盈亏比例</div><div className={`font-bold ${pnlRate >= 0 ? "text-emerald-600" : "text-rose-600"}`}>{pnlRate.toFixed(2)}%</div></div>
           </div>
         </section>
 
