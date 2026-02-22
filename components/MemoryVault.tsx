@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { useState } from "react";
+import { useDeferredValue, useState } from "react";
 import { 
   Book, 
   Search, 
@@ -18,7 +18,8 @@ import {
 
 export default function MemoryVault() {
   const [searchQuery, setSearchQuery] = useState("");
-  const memories = useQuery(api.memories.search, { query: searchQuery });
+  const deferredSearchQuery = useDeferredValue(searchQuery);
+  const memories = useQuery(api.memories.search, { query: deferredSearchQuery });
   const createMemory = useMutation(api.memories.create);
   const updateMemory = useMutation(api.memories.update);
   const removeMemory = useMutation(api.memories.remove);
@@ -66,10 +67,13 @@ export default function MemoryVault() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜索所有记忆、决定与文档..."
+              placeholder="搜索标题、正文、标签、分类..."
               className="w-full pl-10 pr-4 py-3 bg-slate-100 border-none rounded-2xl text-sm focus:ring-2 focus:ring-slate-200 outline-none"
             />
           </div>
+          <p className="text-xs text-slate-400 -mt-2">
+            {searchQuery.trim() ? `“${searchQuery}” 匹配 ${memories?.length ?? 0} 条` : `共 ${memories.length} 条记忆`}
+          </p>
         </div>
 
         <div className="flex-1 overflow-y-auto grid grid-cols-1 xl:grid-cols-2 gap-4 pb-10">

@@ -11,13 +11,31 @@ export const list = query({
 export const search = query({
   args: { query: v.string() },
   handler: async (ctx, args) => {
-    if (args.query === "") {
+    const q = args.query.trim();
+    if (q === "") {
       return await ctx.db.query("memories").order("desc").collect();
     }
-    return await ctx.db
+
+    const contentMatches = await ctx.db
       .query("memories")
-      .withSearchIndex("search_content", (q) => q.search("content", args.query))
+      .withSearchIndex("search_content", (search) => search.search("content", q))
       .collect();
+
+    const all = await ctx.db.query("memories").collect();
+    const lower = q.toLowerCase();
+
+    const fuzzyMatches = all.filter((m) => {
+      const inTitle = m.title.toLowerCase().includes(lower);
+      const inCategory = m.category.toLowerCase().includes(lower);
+      const inTags = m.tags.some((t) => t.toLowerCase().includes(lower));
+      const inContent = m.content.toLowerCase().includes(lower);
+      return inTitle || inCategory || inTags || inContent;
+    });
+
+    const merged = new Map(contentMatches.map((m) => [m._id, m]));
+    for (const m of fuzzyMatches) merged.set(m._id, m);
+
+    return Array.from(merged.values()).sort((a, b) => b.updatedAt - a.updatedAt);
   },
 });
 
