@@ -45,6 +45,9 @@ export default function TeamStructure() {
     role: "Leader / Orchestrator",
     description: "主协调者，负责任务分解、资源分配以及与人类用户的直接沟通。拥有全权限访问和最高级推理能力。",
     soul: "温和、轻松、专业。先解决问题，再解释细节。",
+    identity: "主助手 / 总调度",
+    memory: "维护长期上下文与关键决策",
+    workspacePath: "C:/Users/23742/.openclaw",
     status: "online",
     avatar: "🛠️",
     capabilities: ["Orchestration", "Decision Making", "Memory Management"],
@@ -61,6 +64,7 @@ export default function TeamStructure() {
       soul: member.soul ?? "",
       identity: member.identity ?? "",
       memory: member.memory ?? "",
+      workspacePath: member.workspacePath ?? "",
       avatar: member.avatar ?? "🤖",
       status: member.status,
       capabilities: (member.capabilities ?? []).join(", "),
@@ -80,6 +84,7 @@ export default function TeamStructure() {
       soul: form.soul,
       identity: form.identity,
       memory: form.memory,
+      workspacePath: form.workspacePath,
       avatar: form.avatar,
       status: form.status,
       capabilities: form.capabilities
@@ -131,6 +136,9 @@ export default function TeamStructure() {
                       </div>
                     </div>
                     <p className="text-xs text-slate-500 leading-relaxed mb-4 mt-2">{member.description}</p>
+                    <div className="mb-3 text-[11px] text-slate-500 font-mono bg-slate-50 border border-slate-100 rounded-lg px-2 py-1 truncate" title={member.workspacePath || "未设置"}>
+                      工作空间: {member.workspacePath || "未设置"}
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {(member.capabilities || []).map((cap: string, i: number) => (
                         <span key={i} className="px-2 py-1 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-medium border border-slate-200/50">
@@ -190,7 +198,8 @@ export default function TeamStructure() {
               )}
             </div>
 
-            <input className="w-full border rounded-xl px-3 py-2 text-sm mb-5" value={form.capabilities} onChange={(e) => setForm({ ...form, capabilities: e.target.value })} placeholder="能力标签，用逗号分隔" />
+            <input className="w-full border rounded-xl px-3 py-2 text-sm mb-3" value={form.capabilities} onChange={(e) => setForm({ ...form, capabilities: e.target.value })} placeholder="能力标签，用逗号分隔" />
+            <input className="w-full border rounded-xl px-3 py-2 text-sm mb-5 font-mono" value={form.workspacePath} onChange={(e) => setForm({ ...form, workspacePath: e.target.value })} placeholder="工作空间路径，如 C:/Users/23742/.openclaw" />
 
             <div className="flex justify-end gap-3">
               <button onClick={() => { setSelected(null); setForm(null); }} className="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-50">取消</button>

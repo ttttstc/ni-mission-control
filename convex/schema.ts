@@ -41,6 +41,7 @@ export default defineSchema({
     soul: v.optional(v.string()),
     identity: v.optional(v.string()),
     memory: v.optional(v.string()),
+    workspacePath: v.optional(v.string()),
     avatar: v.optional(v.string()), // Emoji or path
     status: v.string(), // "active", "idle", "offline"
     capabilities: v.array(v.string()),
