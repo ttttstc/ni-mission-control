@@ -46,4 +46,18 @@ export default defineSchema({
     key: v.string(),
     value: v.string(),
   }).index("by_key", ["key"]),
+  tokenMetrics: defineTable({
+    model: v.string(),
+    requestType: v.string(),
+    inputTokens: v.number(),
+    outputTokens: v.number(),
+    totalTokens: v.number(),
+    durationMs: v.optional(v.number()),
+    status: v.string(),
+    sessionKey: v.optional(v.string()),
+    costUsd: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_model", ["model"])
+    .index("by_createdAt", ["createdAt"]),
 });

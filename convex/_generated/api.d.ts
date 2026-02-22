@@ -14,6 +14,7 @@ import type * as events from "../events.js";
 import type * as memories from "../memories.js";
 import type * as settings from "../settings.js";
 import type * as tasks from "../tasks.js";
+import type * as tokenMetrics from "../tokenMetrics.js";
 
 import type {
   ApiFromModules,
@@ -28,6 +29,7 @@ declare const fullApi: ApiFromModules<{
   memories: typeof memories;
   settings: typeof settings;
   tasks: typeof tasks;
+  tokenMetrics: typeof tokenMetrics;
 }>;
 
 /**

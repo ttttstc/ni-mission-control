@@ -88,7 +88,7 @@ export default function UnifiedWorkspace() {
             <button 
               onClick={() => setActiveTab("openclaw")}
               className={`p-3 rounded-2xl transition-all duration-300 ${activeTab === "openclaw" ? "bg-white text-indigo-600 shadow-md ring-1 ring-slate-200" : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"}`}
-              title="OpenClaw 远程控制"
+              title="OpenClaw Token 监控"
             >
               <ShieldCheck size={24} />
             </button>
@@ -118,7 +118,7 @@ export default function UnifiedWorkspace() {
                   {activeTab === "memory" && "核心记忆库"}
                   {activeTab === "team" && "团队架构展示"}
                   {activeTab === "office" && "数字化办公室"}
-                  {activeTab === "openclaw" && "OpenClaw 控制台"}
+                  {activeTab === "openclaw" && "OpenClaw Token 监控"}
                 </h1>
                 <p className="text-sm text-slate-400 font-medium mt-1">
                   {activeTab === "tasks" && "追踪每一个协作细节"}
@@ -127,7 +127,7 @@ export default function UnifiedWorkspace() {
                   {activeTab === "memory" && "沉淀项目决策、偏好与技术积累"}
                   {activeTab === "team" && "查看主助手及其随叫随到的子智能体集群"}
                   {activeTab === "office" && "实时观测每一位 AI 智能体的工作状态与工位"}
-                  {activeTab === "openclaw" && "通过云端隧道远程管理本地 OpenClaw 服务"}
+                  {activeTab === "openclaw" && "查看 Token 消耗、模型调用分布与每次请求明细"}
                 </p>
               </div>
               
