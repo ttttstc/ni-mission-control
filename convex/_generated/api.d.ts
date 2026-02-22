@@ -12,6 +12,7 @@ import type * as agents from "../agents.js";
 import type * as content from "../content.js";
 import type * as events from "../events.js";
 import type * as memories from "../memories.js";
+import type * as settings from "../settings.js";
 import type * as tasks from "../tasks.js";
 
 import type {
@@ -25,6 +26,7 @@ declare const fullApi: ApiFromModules<{
   content: typeof content;
   events: typeof events;
   memories: typeof memories;
+  settings: typeof settings;
   tasks: typeof tasks;
 }>;
 

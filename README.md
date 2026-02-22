@@ -59,7 +59,7 @@
 NEXT_PUBLIC_CONVEX_URL=https://your-project.convex.cloud
 CONVEX_DEPLOYMENT=dev:your-project-name
 
-NEXT_PUBLIC_ACCESS_PASSWORD=nini
+NEXT_PUBLIC_ACCESS_PASSWORD=xxx
 ```
 
 ### 3. 安装依赖
@@ -71,7 +71,7 @@ npm install
 ```bash
 npm run dev
 ```
-打开 [http://localhost:3000](http://localhost:3000) 即可访问。
+打开 [http://localhost:3000] 即可访问。
 
 ## 🛠️ 使用方式
 

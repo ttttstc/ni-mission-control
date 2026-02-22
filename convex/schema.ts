@@ -42,4 +42,8 @@ export default defineSchema({
     status: v.string(), // "active", "idle", "offline"
     capabilities: v.array(v.string()),
   }),
+  settings: defineTable({
+    key: v.string(),
+    value: v.string(),
+  }).index("by_key", ["key"]),
 });
