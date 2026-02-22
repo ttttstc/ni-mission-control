@@ -35,43 +35,44 @@
 2. Convex 实时处理并同步数据至所有连接的客户端。
 3. 前端通过 `useQuery` 实现响应式状态更新。
 
-## 🚀 快速开始
+## 🚀 快速开始（初学者友好版）
 
-### 1. 环境准备
-确保本地安装了 Node.js 环境，并克隆了本项目。
+> 5 分钟上手：无需复杂配置，先跑起来再深入。
 
-### 2. 配置文件
-在项目根目录创建 `.env.local` 文件，并参考以下说明补充配置：
-
-#### Convex 实时后端配置
-本项目使用 [Convex](https://www.convex.dev/) 作为实时数据库和后端。你需要：
-1. 注册并登录 Convex 官网。
-2. 在本地执行 `npx convex dev`，它会自动引导你创建项目并生成相关环境变量。
-3. **关键变量说明**：
-   - `NEXT_PUBLIC_CONVEX_URL`: 你的 Convex 项目访问地址（通常以 `.convex.cloud` 结尾）。它让前端知道去哪里连接数据库。
-   - `CONVEX_DEPLOYMENT`: 部署标识符（格式如 `dev:project-name-123`）。这对于 Convex 命令行工具同步 Schema 和函数至关重要。
-
-#### 访问安全配置
-- `NEXT_PUBLIC_ACCESS_PASSWORD`: 设置进入 Mission Control 的访问密码。此密码仅在前端 `LoginGate` 组件中校验，用于基础的访问隔离。
-
-```env
-# 示例配置
-NEXT_PUBLIC_CONVEX_URL=https://your-project.convex.cloud
-CONVEX_DEPLOYMENT=dev:your-project-name
-
-NEXT_PUBLIC_ACCESS_PASSWORD=xxx
-```
-
-### 3. 安装依赖
+### ✅ 第一步：一键启动（推荐）
 ```bash
+git clone https://github.com/ttttstc/ni-mission-control.git
+cd ni-mission-control
 npm install
-```
-
-### 4. 运行开发服务器
-```bash
+npx convex dev  # 👈 这一步会自动创建 Convex 项目并生成 .env.local
 npm run dev
 ```
-打开 [http://localhost:3000] 即可访问。
+- 打开 [http://localhost:3000]
+- 如果提示密码，直接删掉 `.env.local` 中的 `NEXT_PUBLIC_ACCESS_PASSWORD` 行即可跳过登录。
+
+### ✅ 第二步：理解核心结构
+| 目录 | 作用 |
+|------|------|
+| `/app` | 页面路由与主逻辑（Next.js App Router） |
+| `/components` | 功能模块（任务、记忆、团队等） |
+| `/convex` | 数据库定义 + 实时 API（Mutation/Query） |
+| `/docs` | 架构文档（本文档） |
+
+### ✅ 第三步：修改与扩展
+- **想改“小泥巴”的性格？**  
+  编辑 `convex/agents.ts` 中的 `ensureDefaults` 数组，或在页面里点开编辑保存。
+- **想加一个新页面？**  
+  在 `/app` 下新建 `new-page/page.tsx`，并在 `app/layout.tsx` 的导航栏里加一行 `<Link href="/new-page">新板块</Link>`。
+- **想用自己电脑的文件？**  
+  在 `TeamStructure` 里为每个 agent 配置 `workspacePath`，然后运行本地代理脚本（见 docs/architecture.md）。
+
+### 📚 深入学习
+- 详细架构设计：`docs/architecture.md`
+- 所有 API 文档：`convex/_generated/api.d.ts`
+- 本地调试技巧：在 `components/` 里加 `console.log`，`npm run dev` 会热更新。
+
+---
+*祝你复刻顺利！有问题随时问小泥巴 🛠️*
 
 ## 🛠️ 使用方式
 
