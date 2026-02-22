@@ -46,9 +46,8 @@ export default function TeamStructure() {
 
   const coreTeam = agents;
 
-  const openDetail = (member: any) => {
-    setSelected(member);
-    setForm({
+  const openDetail = async (member: any) => {
+    const baseForm = {
       name: member.name,
       role: member.role,
       description: member.description,
@@ -59,11 +58,47 @@ export default function TeamStructure() {
       avatar: member.avatar ?? "🤖",
       status: member.status,
       capabilities: (member.capabilities ?? []).join(", "),
-    });
+    };
+
+    setSelected(member);
+    setForm(baseForm);
     setShowSoul(false);
     setShowIdentity(false);
     setShowMemory(false);
+
+    if (baseForm.workspacePath) {
+      const resp = await fetch(`/api/agent-config-sync?path=${encodeURIComponent(baseForm.workspacePath)}`);
+      const data = await resp.json();
+      if (data?.ok) {
+        setForm((prev: any) => ({
+          ...prev,
+          soul: data.soul || prev.soul,
+          identity: data.identity || prev.identity,
+          memory: data.memory || prev.memory,
+        }));
+      }
+    }
   };
+
+  useEffect(() => {
+    if (!selected || !form?.workspacePath) return;
+
+    const tick = async () => {
+      const resp = await fetch(`/api/agent-config-sync?path=${encodeURIComponent(form.workspacePath)}`);
+      const data = await resp.json();
+      if (data?.ok) {
+        setForm((prev: any) => ({
+          ...prev,
+          soul: data.soul ?? prev.soul,
+          identity: data.identity ?? prev.identity,
+          memory: data.memory ?? prev.memory,
+        }));
+      }
+    };
+
+    const timer = setInterval(tick, 2500);
+    return () => clearInterval(timer);
+  }, [selected, form?.workspacePath]);
 
   const saveDetail = async () => {
     if (!selected?._id) return;
