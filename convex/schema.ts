@@ -38,6 +38,7 @@ export default defineSchema({
     name: v.string(),
     role: v.string(),
     description: v.string(),
+    soul: v.optional(v.string()),
     avatar: v.optional(v.string()), // Emoji or path
     status: v.string(), // "active", "idle", "offline"
     capabilities: v.array(v.string()),

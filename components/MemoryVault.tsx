@@ -160,20 +160,39 @@ export default function MemoryVault() {
               />
             </section>
 
-            <section className="flex gap-4 items-center">
-              <div className="flex items-center gap-2 text-slate-400">
-                <Tag size={14} />
-                <span className="text-xs">分类:</span>
-                <select 
-                  value={selectedItem.category}
-                  onChange={(e) => updateMemory({ id: selectedId as any, category: e.target.value })}
-                  className="bg-transparent border-none text-xs font-bold text-slate-600 focus:ring-0 p-0 cursor-pointer"
-                >
-                  <option value="project">项目决策</option>
-                  <option value="personal">个人偏好</option>
-                  <option value="technical">技术架构</option>
-                  <option value="other">其他</option>
-                </select>
+            <section className="space-y-3">
+              <div className="flex gap-4 items-center">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Tag size={14} />
+                  <span className="text-xs">分类:</span>
+                  <select 
+                    value={selectedItem.category}
+                    onChange={(e) => updateMemory({ id: selectedId as any, category: e.target.value })}
+                    className="bg-transparent border-none text-xs font-bold text-slate-600 focus:ring-0 p-0 cursor-pointer"
+                  >
+                    <option value="project">项目决策</option>
+                    <option value="personal">个人偏好</option>
+                    <option value="technical">技术架构</option>
+                    <option value="other">其他</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">标签（逗号分隔）</label>
+                <input
+                  value={(selectedItem.tags || []).join(", ")}
+                  onChange={(e) =>
+                    updateMemory({
+                      id: selectedId as any,
+                      tags: e.target.value
+                        .split(",")
+                        .map((t) => t.trim())
+                        .filter(Boolean),
+                    })
+                  }
+                  className="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-slate-100 outline-none"
+                  placeholder="例如：架构, 决策, 优先级"
+                />
               </div>
             </section>
 

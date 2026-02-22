@@ -39,6 +39,23 @@ export const updateStatus = mutation({
   },
 });
 
+export const updateProfile = mutation({
+  args: {
+    id: v.id("agents"),
+    name: v.optional(v.string()),
+    role: v.optional(v.string()),
+    description: v.optional(v.string()),
+    soul: v.optional(v.string()),
+    avatar: v.optional(v.string()),
+    capabilities: v.optional(v.array(v.string())),
+    status: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { id, ...patch } = args;
+    await ctx.db.patch(id, patch);
+  },
+});
+
 export const remove = mutation({
   args: { id: v.id("agents") },
   handler: async (ctx, args) => {
