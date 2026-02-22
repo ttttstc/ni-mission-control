@@ -1,35 +1,36 @@
 @echo off
 setlocal enabledelayedexpansion
-
 cd /d "%~dp0.."
 
 echo 🚀 启动 ni-mission-control + Cloudflare Tunnel...
-echo.
 
 :: 1) 启动本地服务
 start "ni-mission-control-dev" cmd /k "npm run dev"
 timeout /t 6 /nobreak >nul
-echo ✅ 本地服务已启动: http://localhost:3000
 
-:: 2) 启动 cloudflared
-where cloudflared >nul 2>nul
-if errorlevel 1 (
-  echo 🔧 未检测到 cloudflared，正在安装...
-  npm i -g cloudflared
+:: 2) 启动 tunnel（按你的要求使用 npx cloudflared@latest）
+if exist tunnel.log del /f /q tunnel.log >nul 2>nul
+start "ni-mission-control-tunnel" cmd /c "npx cloudflared@latest tunnel --url http://localhost:3000 > tunnel.log 2>&1"
+
+echo 🌐 正在获取公网 URL...
+set "TUNNEL_URL="
+for /l %%i in (1,1,25) do (
+  for /f "tokens=* delims=" %%u in ('findstr /r /c:"https://[a-z0-9-]*\.trycloudflare\.com" tunnel.log 2^>nul') do (
+    set "TUNNEL_URL=%%u"
+  )
+  if defined TUNNEL_URL goto :found
+  timeout /t 1 /nobreak >nul
 )
 
-echo 🌐 正在建立 Cloudflare Tunnel...
-start "ni-mission-control-tunnel" cmd /k "cloudflared tunnel --url http://localhost:3000 --no-autoupdate --loglevel info"
-timeout /t 8 /nobreak >nul
-
-:: 3) 通过 PowerShell 获取最新 trycloudflare URL（从 cloudflared 进程输出较难直取，这里主动请求本地日志接口不可用时给出提示）
-set "TUNNEL_URL="
-for /f "usebackq delims=" %%u in (`powershell -NoProfile -Command "$p = Get-Process cloudflared -ErrorAction SilentlyContinue; if(-not $p){exit 0}; ''"`) do set "TUNNEL_URL=%%u"
-
-:: 这里直接让用户从 tunnel 窗口复制 URL，同时弹窗提示
-powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('本地服务和 Tunnel 已启动。\n\n请在名为 ni-mission-control-tunnel 的窗口中复制最新 https://*.trycloudflare.com 地址。\n\n关闭该 tunnel 窗口即停止公网访问。','ni-mission-control 已启动',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information)" >nul
+:found
+if defined TUNNEL_URL (
+  echo ✅ 公网地址：!TUNNEL_URL!
+  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('隧道已建立！`n`n公网地址：`n!TUNNEL_URL!`n`n请保持此窗口打开。','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information)" >nul
+) else (
+  echo ⚠️ 未自动解析到 URL，请打开 tunnel.log 查看。
+  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('未自动解析到公网地址，请打开 scripts 同级目录下 tunnel.log 查看。','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning)" >nul
+)
 
 echo.
-echo 📌 已保持窗口不退出。请不要关闭 tunnel 窗口。
-echo 按任意键结束此脚本（不会自动关闭已打开的 dev/tunnel 窗口）...
+echo 📌 脚本不会自动退出。按任意键退出此窗口（不影响已开的 dev 窗口）。
 pause >nul
