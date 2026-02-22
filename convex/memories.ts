@@ -12,30 +12,22 @@ export const search = query({
   args: { query: v.string() },
   handler: async (ctx, args) => {
     const q = args.query.trim();
+    const all = await ctx.db.query("memories").collect();
+
     if (q === "") {
-      return await ctx.db.query("memories").order("desc").collect();
+      return all.sort((a, b) => b.updatedAt - a.updatedAt);
     }
 
-    const contentMatches = await ctx.db
-      .query("memories")
-      .withSearchIndex("search_content", (search) => search.search("content", q))
-      .collect();
-
-    const all = await ctx.db.query("memories").collect();
-    const lower = q.toLowerCase();
-
-    const fuzzyMatches = all.filter((m) => {
-      const inTitle = m.title.toLowerCase().includes(lower);
-      const inCategory = m.category.toLowerCase().includes(lower);
-      const inTags = m.tags.some((t) => t.toLowerCase().includes(lower));
-      const inContent = m.content.toLowerCase().includes(lower);
+    // 统一走 includes 模糊匹配，确保中文关键词可用
+    const hits = all.filter((m) => {
+      const inTitle = m.title.includes(q) || m.title.toLowerCase().includes(q.toLowerCase());
+      const inCategory = m.category.includes(q) || m.category.toLowerCase().includes(q.toLowerCase());
+      const inTags = m.tags.some((t) => t.includes(q) || t.toLowerCase().includes(q.toLowerCase()));
+      const inContent = m.content.includes(q) || m.content.toLowerCase().includes(q.toLowerCase());
       return inTitle || inCategory || inTags || inContent;
     });
 
-    const merged = new Map(contentMatches.map((m) => [m._id, m]));
-    for (const m of fuzzyMatches) merged.set(m._id, m);
-
-    return Array.from(merged.values()).sort((a, b) => b.updatedAt - a.updatedAt);
+    return hits.sort((a, b) => b.updatedAt - a.updatedAt);
   },
 });
 
