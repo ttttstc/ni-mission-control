@@ -83,6 +83,18 @@ export default function TeamStructure() {
         .map((s: string) => s.trim())
         .filter(Boolean),
     });
+
+    await fetch("/api/agent-config-sync", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        workspacePath: form.workspacePath,
+        soul: form.soul,
+        identity: form.identity,
+        memory: form.memory,
+      }),
+    });
+
     setSelected(null);
     setForm(null);
   };
