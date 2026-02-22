@@ -1,43 +1,35 @@
 @echo off
-setlocal enabledelayedexpansion
+setlocal EnableExtensions EnableDelayedExpansion
 
-:: 防止双击后一闪而过：自动拉起持久窗口
-if /i "%~1" neq "--stay" (
-  start "ni-mission-control-launch" cmd /k ""%~f0" --stay"
-  exit /b
-)
-
+REM Run from project root
 cd /d "%~dp0.."
 
-echo 启动 ni-mission-control + Cloudflare Tunnel...
+echo [1/3] Start local dev server...
+start "ni-mission-control-dev" cmd.exe /k "cd /d "%cd%" && npm run dev"
 
-:: 1) 启动本地服务
-start "ni-mission-control-dev" cmd /k "npm run dev"
 timeout /t 6 /nobreak >nul
 
-:: 2) 启动 tunnel（按你的要求使用 npx cloudflared@latest）
-if exist tunnel.log del /f /q tunnel.log >nul 2>nul
-start "ni-mission-control-tunnel" cmd /c "npx cloudflared@latest tunnel --url http://localhost:3000 > tunnel.log 2>&1"
+echo [2/3] Start Cloudflare tunnel...
+if exist "tunnel.log" del /f /q "tunnel.log" >nul 2>nul
+start "ni-mission-control-tunnel" cmd.exe /k "cd /d "%cd%" && npx cloudflared@latest tunnel --url http://localhost:3000 > tunnel.log 2>&1"
 
-echo 🌐 正在获取公网 URL...
+echo [3/3] Parse public URL from tunnel.log...
 set "TUNNEL_URL="
-for /l %%i in (1,1,25) do (
-  for /f "tokens=* delims=" %%u in ('findstr /r /c:"https://[a-z0-9-]*\.trycloudflare\.com" tunnel.log 2^>nul') do (
-    set "TUNNEL_URL=%%u"
-  )
+for /l %%i in (1,1,40) do (
+  for /f "tokens=* delims=" %%u in ('findstr /r /c:"https://[a-z0-9-]*\.trycloudflare\.com" "tunnel.log" 2^>nul') do set "TUNNEL_URL=%%u"
   if defined TUNNEL_URL goto :found
   timeout /t 1 /nobreak >nul
 )
 
 :found
 if defined TUNNEL_URL (
-  echo ✅ 公网地址：!TUNNEL_URL!
-  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('隧道已建立！`n`n公网地址：`n!TUNNEL_URL!`n`n请保持此窗口打开。','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information)" >nul
+  echo Public URL: !TUNNEL_URL!
+  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Tunnel ready.`n`nPublic URL:`n!TUNNEL_URL!`n`nKeep tunnel window open.','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Information)" >nul
 ) else (
-  echo ⚠️ 未自动解析到 URL，请打开 tunnel.log 查看。
-  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('未自动解析到公网地址，请打开 scripts 同级目录下 tunnel.log 查看。','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning)" >nul
+  echo Could not parse URL automatically. Please check tunnel.log.
+  powershell -NoProfile -Command "Add-Type -AssemblyName System.Windows.Forms; [System.Windows.Forms.MessageBox]::Show('Could not parse public URL automatically. Please open tunnel.log.','ni-mission-control',[System.Windows.Forms.MessageBoxButtons]::OK,[System.Windows.Forms.MessageBoxIcon]::Warning)" >nul
 )
 
 echo.
-echo 📌 脚本不会自动退出。按任意键退出此窗口（不影响已开的 dev 窗口）。
+echo This window will stay open. Press any key to exit this launcher.
 pause >nul
