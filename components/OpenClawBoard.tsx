@@ -11,9 +11,19 @@ function formatNumber(n: number) {
 
 export default function OpenClawBoard() {
   const [range, setRange] = useState<7 | 30>(7);
-  const summary = useQuery(api.tokenMetrics.summary, { days: range });
-  const byModel = useQuery(api.tokenMetrics.byModel, { days: range });
-  const recent = useQuery(api.tokenMetrics.recent, { limit: 20 });
+  const summary = useQuery(api.tokenMetrics.summary, { days: range, refetchKey: summaryRefetch });
+  const byModel = useQuery(api.tokenMetrics.byModel, { days: range, refetchKey: byModelRefetch });
+  const recent = useQuery(api.tokenMetrics.recent, { limit: 20, refetchKey: recentRefetch });
+
+  const [summaryRefetch, setSummaryRefetch] = useState(0);
+  const [byModelRefetch, setByModelRefetch] = useState(0);
+  const [recentRefetch, setRecentRefetch] = useState(0);
+
+  const refreshAll = () => {
+    setSummaryRefetch(v => v + 1);
+    setByModelRefetch(v => v + 1);
+    setRecentRefetch(v => v + 1);
+  };
 
   const usdToCny = 7.2;
   const costCny = (summary?.costUsd ?? 0) * usdToCny;
@@ -30,8 +40,8 @@ export default function OpenClawBoard() {
             <button onClick={() => setRange(7)} className={`px-3 py-1 rounded-full ${range === 7 ? "bg-white text-indigo-600" : "text-white/80"}`}>近7天</button>
             <button onClick={() => setRange(30)} className={`px-3 py-1 rounded-full ${range === 30 ? "bg-white text-indigo-600" : "text-white/80"}`}>近30天</button>
           </div>
-          <button onClick={() => window.location.reload()} className="text-[10px] font-medium opacity-90 hover:opacity-100 flex items-center gap-1" title="刷新监控数据">
-            <RefreshCw size={12} /> 刷新
+          <button onClick={refreshAll} className="text-[10px] font-medium opacity-90 hover:opacity-100 flex items-center gap-1" title="实时刷新（不重载页面）">
+            <RefreshCw size={12} /> 实时刷新
           </button>
         </div>
       </div>
