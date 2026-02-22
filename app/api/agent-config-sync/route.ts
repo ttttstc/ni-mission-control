@@ -9,6 +9,8 @@ type Payload = {
   memory?: string;
 };
 
+const REMOTE_PROXY = process.env.AGENT_SYNC_PROXY_URL;
+
 async function readSafe(workspacePath: string, fileName: string) {
   try {
     return await readFile(path.join(workspacePath, fileName), "utf8");
@@ -17,7 +19,37 @@ async function readSafe(workspacePath: string, fileName: string) {
   }
 }
 
+async function forwardToRemote(method: "GET" | "POST", req: NextRequest) {
+  if (!REMOTE_PROXY) return null;
+
+  try {
+    if (method === "GET") {
+      const { searchParams } = new URL(req.url);
+      const workspacePath = searchParams.get("path")?.trim() ?? "";
+      const resp = await fetch(`${REMOTE_PROXY.replace(/\/$/, "")}/read?path=${encodeURIComponent(workspacePath)}`, {
+        method: "GET",
+      });
+      const data = await resp.json();
+      return NextResponse.json(data, { status: resp.status });
+    }
+
+    const body = (await req.json()) as Payload;
+    const resp = await fetch(`${REMOTE_PROXY.replace(/\/$/, "")}/write`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await resp.json();
+    return NextResponse.json(data, { status: resp.status });
+  } catch (error: any) {
+    return NextResponse.json({ ok: false, error: `remote proxy error: ${error?.message ?? "unknown"}` }, { status: 502 });
+  }
+}
+
 export async function GET(req: NextRequest) {
+  const forwarded = await forwardToRemote("GET", req);
+  if (forwarded) return forwarded;
+
   try {
     const { searchParams } = new URL(req.url);
     const workspacePath = searchParams.get("path")?.trim();
@@ -39,6 +71,9 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  const forwarded = await forwardToRemote("POST", req);
+  if (forwarded) return forwarded;
+
   try {
     const body = (await req.json()) as Payload;
     const workspacePath = body.workspacePath?.trim();
