@@ -41,14 +41,25 @@
 确保本地安装了 Node.js 环境，并克隆了本项目。
 
 ### 2. 配置文件
-在项目根目录创建 `.env.local` 文件，并补充以下配置：
-```env
-# Convex 配置 (从 Convex 控制台获取)
-NEXT_PUBLIC_CONVEX_URL=your_convex_url
-CONVEX_DEPLOYMENT=your_deployment_id
+在项目根目录创建 `.env.local` 文件，并参考以下说明补充配置：
 
-# 访问安全配置
-NEXT_PUBLIC_ACCESS_PASSWORD=your_password
+#### Convex 实时后端配置
+本项目使用 [Convex](https://www.convex.dev/) 作为实时数据库和后端。你需要：
+1. 注册并登录 Convex 官网。
+2. 在本地执行 `npx convex dev`，它会自动引导你创建项目并生成相关环境变量。
+3. **关键变量说明**：
+   - `NEXT_PUBLIC_CONVEX_URL`: 你的 Convex 项目访问地址（通常以 `.convex.cloud` 结尾）。它让前端知道去哪里连接数据库。
+   - `CONVEX_DEPLOYMENT`: 部署标识符（格式如 `dev:project-name-123`）。这对于 Convex 命令行工具同步 Schema 和函数至关重要。
+
+#### 访问安全配置
+- `NEXT_PUBLIC_ACCESS_PASSWORD`: 设置进入 Mission Control 的访问密码。此密码仅在前端 `LoginGate` 组件中校验，用于基础的访问隔离。
+
+```env
+# 示例配置
+NEXT_PUBLIC_CONVEX_URL=https://your-project.convex.cloud
+CONVEX_DEPLOYMENT=dev:your-project-name
+
+NEXT_PUBLIC_ACCESS_PASSWORD=nini
 ```
 
 ### 3. 安装依赖
