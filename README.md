@@ -35,20 +35,26 @@
 2. Convex 实时处理并同步数据至所有连接的客户端。
 3. 前端通过 `useQuery` 实现响应式状态更新。
 
-## 🚀 快速开始（初学者友好版）
+## 🚀 快速开始
 
-> 5 分钟上手：无需复杂配置，先跑起来再深入。
+> 本看板依赖以下前置条件，请确保已满足：
 
-### ✅ 第一步：一键启动（推荐）
+### 🔧 前置条件
+1. **Node.js 环境**：v18+（推荐 v20+）
+2. **Git**：用于克隆与版本管理
+3. **Convex 账号**：访问 [https://www.convex.dev](https://www.convex.dev) 注册
+4. **(可选) Cloudflare Tunnel**：如需公网访问本地文件，需安装 `cloudflared`
+
+### ✅ 启动流程
 ```bash
 git clone https://github.com/ttttstc/ni-mission-control.git
 cd ni-mission-control
 npm install
-npx convex dev  # 👈 这一步会自动创建 Convex 项目并生成 .env.local
+npx convex dev  # 自动引导创建 Convex 项目并生成 .env.local
 npm run dev
 ```
-- 打开 [http://localhost:3000]
-- 如果提示密码，直接删掉 `.env.local` 中的 `NEXT_PUBLIC_ACCESS_PASSWORD` 行即可跳过登录。
+- 访问 [http://localhost:3000]
+- 如需跳过登录，删除 `.env.local` 中的 `NEXT_PUBLIC_ACCESS_PASSWORD` 行
 
 ### ✅ 第二步：理解核心结构
 | 目录 | 作用 |

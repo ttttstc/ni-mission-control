@@ -87,10 +87,26 @@ npm run dev
   ```
 - 密码是可选的，删掉 `NEXT_PUBLIC_ACCESS_PASSWORD` 就跳过登录。
 
-### ✅ 第三步：修改与扩展
-- **新增一个 Agent**：在 `convex/agents.ts` 的 `ensureDefaults` 里加一个对象。
-- **新增一个页面**：在 `/app` 下新建 `page.tsx`，并在 `app/layout.tsx` 中注册导航项。
-- **本地文件同步**：确保你的 `workspacePath` 是 Windows 路径（如 `D:/company/roles/dev`），并启动本地代理脚本。
+### ✅ 第三步：配置与扩展（推荐方式）
+
+> 优先使用页面配置或环境变量，而非直接修改代码。
+
+- **新增 Agent**：  
+  在 **AI 协作团队** 页面点击“+”按钮（或打开已有角色 → 编辑 → 保存），系统会自动写入 Convex 数据库。  
+  （代码中的 `ensureDefaults` 仅用于初始化，日常增删请用页面操作）
+
+- **新增页面**：  
+  1. 在 `/app` 下新建目录（如 `my-panel`）  
+  2. 创建 `page.tsx`（参考现有页面结构）  
+  3. 在左侧导航栏中添加链接（编辑 `app/page.tsx` 中的 `<NavigationRail>` 组件）  
+  > 提示：所有页面都基于 Next.js App Router，无需额外路由配置。
+
+- **本地文件同步**：  
+  为任意 Agent 配置 `workspacePath`（如 `D:/company/roles/dev`），然后：
+  - 本地运行 `node local-agent-sync-proxy.mjs`
+  - Vercel 配置 `AGENT_SYNC_PROXY_URL` 环境变量  
+  页面点击“刷新”即可同步本地 `.md` 文件。
+
 
 ---
 
