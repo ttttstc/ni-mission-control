@@ -4,7 +4,7 @@ import { ShieldAlert } from "lucide-react";
 
 export default function OpenClawBoard() {
   // 动态使用 Cloudflare Tunnel 的公网地址，确保公网访问不被拦截
-  const TUNNEL_URL = "https://gate-small-gets-islands.trycloudflare.com";
+  const TUNNEL_URL = "https://sunrise-pens-translations-attorneys.trycloudflare.com";
 
   return (
     <div className="h-full w-full bg-slate-50 rounded-[2.5rem] overflow-hidden border border-slate-100 flex flex-col relative shadow-inner">
