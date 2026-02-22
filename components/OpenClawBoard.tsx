@@ -3,14 +3,17 @@
 import { BarChart3, Clock3, Coins, Database, RefreshCw } from "lucide-react";
 import { useQuery } from "convex/react";
 import { api } from "../convex/_generated/api";
+import { useState } from "react";
 
 function formatNumber(n: number) {
   return new Intl.NumberFormat("zh-CN").format(n);
 }
 
 export default function OpenClawBoard() {
-  const summary = useQuery(api.tokenMetrics.summary);
-  const byModel = useQuery(api.tokenMetrics.byModel);
+  const [range, setRange] = useState<7 | 30>(7);
+
+  const summary = useQuery(api.tokenMetrics.summary, { days: range });
+  const byModel = useQuery(api.tokenMetrics.byModel, { days: range });
   const recent = useQuery(api.tokenMetrics.recent, { limit: 20 });
 
   return (
@@ -20,13 +23,29 @@ export default function OpenClawBoard() {
           <BarChart3 size={14} />
           <span className="text-[10px] font-bold uppercase tracking-widest">OpenClaw Token Monitor</span>
         </div>
-        <button
-          onClick={() => window.location.reload()}
-          className="text-[10px] font-medium opacity-90 hover:opacity-100 flex items-center gap-1"
-          title="刷新监控数据"
-        >
-          <RefreshCw size={12} /> 刷新
-        </button>
+        <div className="flex items-center gap-2">
+          <div className="bg-white/20 rounded-full p-0.5 text-[10px]">
+            <button
+              onClick={() => setRange(7)}
+              className={`px-3 py-1 rounded-full ${range === 7 ? "bg-white text-indigo-600" : "text-white/80"}`}
+            >
+              近7天
+            </button>
+            <button
+              onClick={() => setRange(30)}
+              className={`px-3 py-1 rounded-full ${range === 30 ? "bg-white text-indigo-600" : "text-white/80"}`}
+            >
+              近30天
+            </button>
+          </div>
+          <button
+            onClick={() => window.location.reload()}
+            className="text-[10px] font-medium opacity-90 hover:opacity-100 flex items-center gap-1"
+            title="刷新监控数据"
+          >
+            <RefreshCw size={12} /> 刷新
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 overflow-auto p-6 space-y-6">

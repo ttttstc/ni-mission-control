@@ -31,9 +31,16 @@ export const recent = query({
 });
 
 export const summary = query({
-  args: {},
-  handler: async (ctx) => {
-    const rows = await ctx.db.query("tokenMetrics").collect();
+  args: { days: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const rows = args.days
+      ? await ctx.db
+          .query("tokenMetrics")
+          .withIndex("by_createdAt", (query) =>
+            query.gte("createdAt", Date.now() - args.days! * 24 * 60 * 60 * 1000),
+          )
+          .collect()
+      : await ctx.db.query("tokenMetrics").collect();
     return rows.reduce(
       (acc, row) => {
         acc.requests += 1;
@@ -49,10 +56,17 @@ export const summary = query({
 });
 
 export const byModel = query({
-  args: {},
-  handler: async (ctx) => {
-    const rows = await ctx.db.query("tokenMetrics").collect();
-    const map = new Map<string, { model: string; requests: number; totalTokens: number; inputTokens: number; outputTokens: number }>();
+  args: { days: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const rows = args.days
+      ? await ctx.db
+          .query("tokenMetrics")
+          .withIndex("by_createdAt", (query) =>
+            query.gte("createdAt", Date.now() - args.days! * 24 * 60 * 60 * 1000),
+          )
+          .collect()
+      : await ctx.db.query("tokenMetrics").collect();
+    const map = new Map<string, { model: string; requests: number; totalTokens: number; inputTokens: number; outputTokens: number; costUsd: number }>();
 
     for (const row of rows) {
       const current = map.get(row.model) ?? {
@@ -61,11 +75,13 @@ export const byModel = query({
         totalTokens: 0,
         inputTokens: 0,
         outputTokens: 0,
+        costUsd: 0,
       };
       current.requests += 1;
       current.totalTokens += row.totalTokens;
       current.inputTokens += row.inputTokens;
       current.outputTokens += row.outputTokens;
+      current.costUsd += row.costUsd ?? 0;
       map.set(row.model, current);
     }
 
