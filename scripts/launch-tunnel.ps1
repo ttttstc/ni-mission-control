@@ -33,8 +33,20 @@ if (Test-Path $_tunnelLog) {
 if ($tunnelUrl) {
     Write-Host "✅ 隧道已就绪！公网访问地址：" -ForegroundColor Green
     Write-Host "    $tunnelUrl" -ForegroundColor Cyan
+
+    # 弹出消息框并保持窗口打开
+    Add-Type -AssemblyName System.Windows.Forms
+    [System.Windows.Forms.MessageBox]::Show(
+        "隧道已就绪！`n`n公网访问地址：`n$tunnelUrl`n`n⚠️ 关闭此窗口将停止本地服务与隧道。",
+        "ni-mission-control 已启动",
+        [System.Windows.Forms.MessageBoxButtons]::OK,
+        [System.Windows.Forms.MessageBoxIcon]::Information
+    )
 } else {
     Write-Host "⚠️ 未自动提取到 URL，请手动查看 tunnel.log" -ForegroundColor Yellow
+    Read-Host "按 Enter 键继续..."
 }
 
-Write-Host "`n📝 提示：关闭此窗口将停止所有进程" -ForegroundColor Gray
+Write-Host "`n📌 请保持此窗口打开，直到你完成操作。" -ForegroundColor Yellow
+Write-Host "按 Enter 键退出并停止所有进程..." -ForegroundColor Gray
+$null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
