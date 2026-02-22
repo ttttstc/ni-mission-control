@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation } from "convex/react";
 import { api } from "../convex/_generated/api";
-import { useDeferredValue, useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   Book, 
   Search, 
@@ -17,9 +17,19 @@ import {
 } from "lucide-react";
 
 export default function MemoryVault() {
+  const [searchInput, setSearchInput] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const deferredSearchQuery = useDeferredValue(searchQuery);
-  const memories = useQuery(api.memories.search, { query: deferredSearchQuery });
+  const [isComposing, setIsComposing] = useState(false);
+
+  useEffect(() => {
+    if (isComposing) return;
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 220);
+    return () => clearTimeout(timer);
+  }, [searchInput, isComposing]);
+
+  const memories = useQuery(api.memories.search, { query: searchQuery });
   const createMemory = useMutation(api.memories.create);
   const updateMemory = useMutation(api.memories.update);
   const removeMemory = useMutation(api.memories.remove);
@@ -65,14 +75,20 @@ export default function MemoryVault() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <input 
               type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onCompositionStart={() => setIsComposing(true)}
+              onCompositionEnd={(e) => {
+                setIsComposing(false);
+                setSearchInput(e.currentTarget.value);
+                setSearchQuery(e.currentTarget.value);
+              }}
               placeholder="搜索标题、正文、标签、分类..."
               className="w-full pl-10 pr-4 py-3 bg-slate-100 border-none rounded-2xl text-sm focus:ring-2 focus:ring-slate-200 outline-none"
             />
           </div>
           <p className="text-xs text-slate-400 -mt-2">
-            {searchQuery.trim() ? `“${searchQuery}” 匹配 ${memories?.length ?? 0} 条` : `共 ${memories.length} 条记忆`}
+            {searchInput.trim() ? `“${searchInput}” 匹配 ${memories?.length ?? 0} 条` : `共 ${memories.length} 条记忆`}
           </p>
         </div>
 
