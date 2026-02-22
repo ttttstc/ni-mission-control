@@ -42,10 +42,6 @@ export default function TeamStructure() {
     ensureDefaults();
   }, [ensureDefaults]);
 
-  if (!agents) return <div className="p-8 text-center text-slate-500">正在扫描团队状态...</div>;
-
-  const coreTeam = agents;
-
   const openDetail = async (member: any) => {
     const baseForm = {
       name: member.name,
@@ -99,6 +95,10 @@ export default function TeamStructure() {
     const timer = setInterval(tick, 2500);
     return () => clearInterval(timer);
   }, [selected, form?.workspacePath]);
+
+  if (!agents) return <div className="p-8 text-center text-slate-500">正在扫描团队状态...</div>;
+
+  const coreTeam = agents;
 
   const saveDetail = async () => {
     if (!selected?._id) return;
