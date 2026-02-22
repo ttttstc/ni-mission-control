@@ -40,6 +40,26 @@ export default function MemoryVault() {
 
   const selectedItem = memories?.find(m => m._id === selectedId);
 
+  const refreshMemories = async () => {
+    if (!memories || memories.length === 0) return;
+    for (const m of memories) {
+      const resp = await fetch(`/api/agent-config-sync?path=${encodeURIComponent("D:/AI/memory")}`);
+      const data = await resp.json();
+      if (!data?.ok) continue;
+
+      // 假设 memory 文件路径为 D:/AI/memory/MEMORY.md，仅用于演示；实际应根据 memory 的 workspacePath 动态生成
+      // 这里简化为：只刷新当前页面记忆（需后续扩展为按 memory.workspacePath）
+      const updated = {
+        ...m,
+        content: data.memory ?? m.content,
+        title: data.title ?? m.title,
+      };
+      if (updated.content !== m.content || updated.title !== m.title) {
+        await updateMemory({ id: m._id, ...updated });
+      }
+    }
+  };
+
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) return;
@@ -87,6 +107,13 @@ export default function MemoryVault() {
               className="w-full pl-10 pr-4 py-3 bg-slate-100 border-none rounded-2xl text-sm focus:ring-2 focus:ring-slate-200 outline-none"
             />
           </div>
+          <button
+            onClick={refreshMemories}
+            className="ml-2 px-3 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1.5 text-xs"
+            title="从本地文件刷新所有记忆"
+          >
+            <RefreshCw size={14} /> 刷新
+          </button>
           <p className="text-xs text-slate-400 -mt-2">
             {searchInput.trim() ? `“${searchInput}” 匹配 ${memories?.length ?? 0} 条` : `共 ${memories.length} 条记忆`}
           </p>

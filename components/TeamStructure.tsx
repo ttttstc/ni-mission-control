@@ -100,6 +100,37 @@ export default function TeamStructure() {
 
   const coreTeam = agents;
 
+  const refreshFromLocal = async () => {
+    if (!form?.workspacePath) return;
+
+    const resp = await fetch(`/api/agent-config-sync?path=${encodeURIComponent(form.workspacePath)}`);
+    const data = await resp.json();
+    if (!data?.ok) return;
+
+    const current = { ...form };
+    const updated = {
+      ...current,
+      soul: data.soul ?? current.soul,
+      identity: data.identity ?? current.identity,
+      memory: data.memory ?? current.memory,
+    };
+
+    // 只有变化才更新 state 和数据库
+    if (
+      updated.soul !== current.soul ||
+      updated.identity !== current.identity ||
+      updated.memory !== current.memory
+    ) {
+      setForm(updated);
+      await updateProfile({
+        id: selected._id,
+        soul: updated.soul,
+        identity: updated.identity,
+        memory: updated.memory,
+      });
+    }
+  };
+
   const saveDetail = async () => {
     if (!selected?._id) return;
     await updateProfile({
@@ -241,6 +272,13 @@ export default function TeamStructure() {
 
             <div className="flex justify-end gap-3">
               <button onClick={() => { setSelected(null); setForm(null); }} className="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-50">取消</button>
+              <button
+                onClick={refreshFromLocal}
+                className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-2"
+                title="从本地文件刷新（SOUL/IDENTITY/MEMORY）"
+              >
+                <RefreshCw size={15} /> 刷新
+              </button>
               <button
                 onClick={saveDetail}
                 disabled={!selected._id}
